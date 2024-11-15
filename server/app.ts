@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
-import { petsRoute } from "./server/routes/petRoutes";
+import { petsRoute } from "./routes/petRoutes";
 
 const app = new Hono();
 
