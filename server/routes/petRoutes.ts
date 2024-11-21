@@ -79,4 +79,19 @@ export const petsRoute = new Hono()
 		}
 		const deletedPet = fakePets.splice(index, 1)[0];
 		return c.json({ pet: deletedPet });
+	})
+	.get("/all-species", (c) => {
+		const counts = fakePets.reduce((acc, pet) => {
+			acc[pet.species] = (acc[pet.species] || 0) + 1;
+			return acc;
+		}, {} as Record<string, number>);
+
+		const speciesCounts = Object.entries(counts).map(([species, count]) => ({
+			species,
+			count,
+		}));
+
+		return c.json({
+			speciesCounts: speciesCounts,
+		});
 	});
