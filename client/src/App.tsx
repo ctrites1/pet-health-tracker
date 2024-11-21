@@ -1,6 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "./components/ui/avatar";
+import { Card, CardContent } from "./components/ui/card";
 import { useEffect, useState } from "react";
+import PetCard from "./components/PetCard";
+import type { Pet } from "./components/PetCard";
+import { api } from "./lib/api";
 
 interface SpeciesCount {
 	species: string;
@@ -9,14 +11,23 @@ interface SpeciesCount {
 
 export default function App() {
 	const [speciesCounts, setSpeciesCounts] = useState<SpeciesCount[]>([]);
+	const [allPets, setAllPets] = useState<Pet[]>([]);
 
 	useEffect(() => {
 		async function fetchSpeciesCounts() {
-			const res = await fetch("/api/pets/all-species");
+			const res = await api.pets["all-species"].$get();
 			const data = await res.json();
 			setSpeciesCounts(data.speciesCounts);
 		}
+
+		async function fetchAllPets() {
+			const res = await api.pets.$get();
+			const data = await res.json();
+			setAllPets(data.pets);
+		}
+
 		fetchSpeciesCounts();
+		fetchAllPets();
 	}, []);
 
 	const getCountForSpecies = (species: string) => {
@@ -41,66 +52,55 @@ export default function App() {
 
 			<main className="flex-1 p-8">
 				<div className="mb-8">
-					<h2 className="text-2xl font-bold mb-4">Pet Types</h2>
-					<div className="flex gap-4">
-						{getCountForSpecies("Dog") && (
-							<Card className="w-[200px]">
-								<CardContent className="pt-6">
-									<div className="text-center">
-										<div className="text-4xl mb-2">🐕</div>
-										<h3 className="text-lg font-semibold">Dogs</h3>
-										<p className="text-sm text-muted-foreground">
-											{getCountForSpecies("Dog")}
-										</p>
-									</div>
-								</CardContent>
-							</Card>
-						)}
-						{getCountForSpecies("Cat") && (
-							<Card className="w-[200px]">
-								<CardContent className="pt-6">
-									<div className="text-center">
-										<div className="text-4xl mb-2">🐈</div>
-										<h3 className="text-lg font-semibold">Cats</h3>
-										<p className="text-sm text-muted-foreground">
-											{getCountForSpecies("Cat")}
-										</p>
-									</div>
-								</CardContent>
-							</Card>
-						)}
-						{getCountForSpecies("Rabbit") && (
-							<Card className="w-[200px]">
-								<CardContent className="pt-6">
-									<div className="text-center">
-										<div className="text-4xl mb-2">🐇</div>
-										<h3 className="text-lg font-semibold">Rabbits</h3>
-										<p className="text-sm text-muted-foreground">
-											{getCountForSpecies("Rabbit")}
-										</p>
-									</div>
-								</CardContent>
-							</Card>
-						)}
+					<h2 className="text-2xl font-bold mb-6">Pets</h2>
+					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+						{allPets.map((pet) => (
+							<PetCard key={pet.id} pet={pet} />
+						))}
 					</div>
 				</div>
-				<h2 className="text-2xl font-bold mb-6">Pets</h2>
-				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-					<Card>
-						<CardHeader>
-							<CardTitle>Max</CardTitle>
-						</CardHeader>
-						<CardContent className="flex items-center space-x-4">
-							<Avatar className="h-20 w-20">
-								<AvatarImage src="/pets/max.jpg" />
-								<AvatarFallback>MX</AvatarFallback>
-							</Avatar>
-							<div>
-								<p>Breed: Labrador Retriever</p>
-								<p>Birthday: December 25, 2011</p>
-							</div>
-						</CardContent>
-					</Card>
+
+				<h2 className="text-2xl font-bold mb-4">Pet Types</h2>
+				<div className="flex gap-4">
+					{getCountForSpecies("Dog") && (
+						<Card className="w-[200px]">
+							<CardContent className="pt-6">
+								<div className="text-center">
+									<div className="text-4xl mb-2">🐕</div>
+									<h3 className="text-lg font-semibold">Dogs</h3>
+									<p className="text-sm text-muted-foreground">
+										{getCountForSpecies("Dog")}
+									</p>
+								</div>
+							</CardContent>
+						</Card>
+					)}
+					{getCountForSpecies("Cat") && (
+						<Card className="w-[200px]">
+							<CardContent className="pt-6">
+								<div className="text-center">
+									<div className="text-4xl mb-2">🐈</div>
+									<h3 className="text-lg font-semibold">Cats</h3>
+									<p className="text-sm text-muted-foreground">
+										{getCountForSpecies("Cat")}
+									</p>
+								</div>
+							</CardContent>
+						</Card>
+					)}
+					{getCountForSpecies("Rabbit") && (
+						<Card className="w-[200px]">
+							<CardContent className="pt-6">
+								<div className="text-center">
+									<div className="text-4xl mb-2">🐇</div>
+									<h3 className="text-lg font-semibold">Rabbits</h3>
+									<p className="text-sm text-muted-foreground">
+										{getCountForSpecies("Rabbit")}
+									</p>
+								</div>
+							</CardContent>
+						</Card>
+					)}
 				</div>
 			</main>
 		</div>

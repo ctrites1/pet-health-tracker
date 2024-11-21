@@ -12,9 +12,10 @@ const petSchema = z.object({
 		.max(new Date(), "Date of birth cannot be in the future"),
 	weight: z.number(),
 	ownerId: z.number().int().positive().min(1),
+	imageUrl: z.string(),
 });
 
-const createPetSchema = petSchema.omit({ id: true });
+const createPetSchema = petSchema.omit({ id: true, imageUrl: true });
 
 type Pet = z.infer<typeof petSchema>;
 
@@ -27,6 +28,7 @@ const fakePets: Pet[] = [
 		dateOfBirth: new Date("2018-06-15"),
 		weight: 4.5,
 		ownerId: 1,
+		imageUrl: "",
 	},
 	{
 		id: 2,
@@ -36,6 +38,7 @@ const fakePets: Pet[] = [
 		dateOfBirth: new Date("2019-04-12"),
 		weight: 2.5,
 		ownerId: 2,
+		imageUrl: "",
 	},
 	{
 		id: 3,
@@ -45,6 +48,7 @@ const fakePets: Pet[] = [
 		dateOfBirth: new Date("2021-07-21"),
 		weight: 1.8,
 		ownerId: 3,
+		imageUrl: "",
 	},
 ];
 
@@ -57,7 +61,7 @@ export const petsRoute = new Hono()
 		const pet = createPetSchema.parse(data);
 		c.status(201);
 
-		fakePets.push({ ...pet, id: fakePets.length + 1 });
+		fakePets.push({ ...pet, id: fakePets.length + 1, imageUrl: "" });
 
 		return c.json(pet);
 	})
