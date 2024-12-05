@@ -1,44 +1,64 @@
 import { Card, CardContent } from "./components/ui/card";
-import { useEffect, useState } from "react";
 import PetCard from "./components/PetCard";
-import type { Pet } from "./components/PetCard";
 import { api } from "./lib/api";
+import { useQuery } from "@tanstack/react-query";
 
-interface SpeciesCount {
-	species: string;
-	count: number;
+async function getAllPets() {
+	const res = await api.pets.$get();
+	if (!res.ok) {
+		throw new Error("Server Error");
+	}
+	const data = await res.json();
+	return data.pets;
+}
+
+async function getSpeciesCount() {
+	const res = await api.pets["all-species"].$get();
+	if (!res.ok) {
+		throw new Error("Server Error");
+	}
+	const data = await res.json();
+	return data;
 }
 
 export default function App() {
-	const [speciesCounts, setSpeciesCounts] = useState<SpeciesCount[]>([]);
-	const [allPets, setAllPets] = useState<Pet[]>([]);
+	const {
+		data: speciesData,
+		isPending: isSpeciesPending,
+		error: speciesError,
+	} = useQuery({
+		queryKey: ["species-count"],
+		queryFn: getSpeciesCount,
+	});
 
-	useEffect(() => {
-		async function fetchSpeciesCounts() {
-			const res = await api.pets["all-species"].$get();
-			const data = await res.json();
-			setSpeciesCounts(data.speciesCounts);
-		}
+	const {
+		data: petsData,
+		isPending: isPetsPending,
+		error: petsError,
+	} = useQuery({
+		queryKey: ["pets"],
+		queryFn: getAllPets,
+	});
 
-		async function fetchAllPets() {
-			const res = await api.pets.$get();
-			const data = await res.json();
-			setAllPets(data.pets);
-		}
+	if (speciesError || petsError) {
+		return <div>Error: {speciesError?.message || petsError?.message}</div>;
+	}
 
-		fetchSpeciesCounts();
-		fetchAllPets();
-	}, []);
+	if (isPetsPending || isSpeciesPending) {
+		return <div>Loading...</div>;
+	}
 
 	const getCountForSpecies = (species: string) => {
-		const speciesData = speciesCounts.find((s) => s.species === species);
-		return speciesData
-			? `${speciesData.count} ${speciesData.count === 1 ? "pet" : "pets"}`
+		const result = speciesData?.speciesCounts.find(
+			(s) => s.species === species
+		);
+		return result
+			? `${result.count} ${result.count === 1 ? "pet" : "pets"}`
 			: "0 pets";
 	};
 
 	return (
-		<div className="flex flex-col min-h-screen">
+		<div className="flex flex-col min-h-screen bg-background">
 			<header className="p-4 border-b">
 				<div className="flex items-center space-x-3">
 					<img
@@ -54,7 +74,7 @@ export default function App() {
 				<div className="mb-8">
 					<h2 className="text-2xl font-bold mb-6">Pets</h2>
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{allPets.map((pet) => (
+						{petsData.map((pet) => (
 							<PetCard key={pet.id} pet={pet} />
 						))}
 					</div>
