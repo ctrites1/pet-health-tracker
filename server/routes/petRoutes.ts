@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
 
+import { db } from "../db";
+import { pets as petsTable } from "server/db/schema/pets";
+
 const petSchema = z.object({
 	id: z.number().int().positive().min(1),
 	name: z.string(),
@@ -53,8 +56,11 @@ const fakePets: Pet[] = [
 ];
 
 export const petsRoute = new Hono()
-	.get("/", (c) => {
-		return c.json({ pets: fakePets });
+	.get("/", async (c) => {
+		const pets = await db.select().from(petsTable);
+		console.log("");
+
+		return c.json({ pets: pets });
 	})
 	.post("/", zValidator("json", createPetSchema), async (c) => {
 		const data = await c.req.valid("json");

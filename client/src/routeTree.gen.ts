@@ -11,28 +11,42 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as MainImport } from './routes/main'
-import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as PetsNewImport } from './routes/pets.new'
+import { Route as PetsPetIdImport } from './routes/pets.$petId'
+import { Route as PetsPetIdHealthRecordsImport } from './routes/pets.$petId.health-records'
+import { Route as PetsPetIdCaregiversImport } from './routes/pets.$petId.caregivers'
 
 // Create/Update Routes
-
-const MainRoute = MainImport.update({
-  id: '/main',
-  path: '/main',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AboutRoute = AboutImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const PetsNewRoute = PetsNewImport.update({
+  id: '/pets/new',
+  path: '/pets/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PetsPetIdRoute = PetsPetIdImport.update({
+  id: '/pets/$petId',
+  path: '/pets/$petId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PetsPetIdHealthRecordsRoute = PetsPetIdHealthRecordsImport.update({
+  id: '/health-records',
+  path: '/health-records',
+  getParentRoute: () => PetsPetIdRoute,
+} as any)
+
+const PetsPetIdCaregiversRoute = PetsPetIdCaregiversImport.update({
+  id: '/caregivers',
+  path: '/caregivers',
+  getParentRoute: () => PetsPetIdRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -46,63 +60,113 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
+    '/pets/$petId': {
+      id: '/pets/$petId'
+      path: '/pets/$petId'
+      fullPath: '/pets/$petId'
+      preLoaderRoute: typeof PetsPetIdImport
       parentRoute: typeof rootRoute
     }
-    '/main': {
-      id: '/main'
-      path: '/main'
-      fullPath: '/main'
-      preLoaderRoute: typeof MainImport
+    '/pets/new': {
+      id: '/pets/new'
+      path: '/pets/new'
+      fullPath: '/pets/new'
+      preLoaderRoute: typeof PetsNewImport
       parentRoute: typeof rootRoute
+    }
+    '/pets/$petId/caregivers': {
+      id: '/pets/$petId/caregivers'
+      path: '/caregivers'
+      fullPath: '/pets/$petId/caregivers'
+      preLoaderRoute: typeof PetsPetIdCaregiversImport
+      parentRoute: typeof PetsPetIdImport
+    }
+    '/pets/$petId/health-records': {
+      id: '/pets/$petId/health-records'
+      path: '/health-records'
+      fullPath: '/pets/$petId/health-records'
+      preLoaderRoute: typeof PetsPetIdHealthRecordsImport
+      parentRoute: typeof PetsPetIdImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface PetsPetIdRouteChildren {
+  PetsPetIdCaregiversRoute: typeof PetsPetIdCaregiversRoute
+  PetsPetIdHealthRecordsRoute: typeof PetsPetIdHealthRecordsRoute
+}
+
+const PetsPetIdRouteChildren: PetsPetIdRouteChildren = {
+  PetsPetIdCaregiversRoute: PetsPetIdCaregiversRoute,
+  PetsPetIdHealthRecordsRoute: PetsPetIdHealthRecordsRoute,
+}
+
+const PetsPetIdRouteWithChildren = PetsPetIdRoute._addFileChildren(
+  PetsPetIdRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/main': typeof MainRoute
+  '/pets/$petId': typeof PetsPetIdRouteWithChildren
+  '/pets/new': typeof PetsNewRoute
+  '/pets/$petId/caregivers': typeof PetsPetIdCaregiversRoute
+  '/pets/$petId/health-records': typeof PetsPetIdHealthRecordsRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/main': typeof MainRoute
+  '/pets/$petId': typeof PetsPetIdRouteWithChildren
+  '/pets/new': typeof PetsNewRoute
+  '/pets/$petId/caregivers': typeof PetsPetIdCaregiversRoute
+  '/pets/$petId/health-records': typeof PetsPetIdHealthRecordsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/main': typeof MainRoute
+  '/pets/$petId': typeof PetsPetIdRouteWithChildren
+  '/pets/new': typeof PetsNewRoute
+  '/pets/$petId/caregivers': typeof PetsPetIdCaregiversRoute
+  '/pets/$petId/health-records': typeof PetsPetIdHealthRecordsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/main'
+  fullPaths:
+    | '/'
+    | '/pets/$petId'
+    | '/pets/new'
+    | '/pets/$petId/caregivers'
+    | '/pets/$petId/health-records'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/main'
-  id: '__root__' | '/' | '/about' | '/main'
+  to:
+    | '/'
+    | '/pets/$petId'
+    | '/pets/new'
+    | '/pets/$petId/caregivers'
+    | '/pets/$petId/health-records'
+  id:
+    | '__root__'
+    | '/'
+    | '/pets/$petId'
+    | '/pets/new'
+    | '/pets/$petId/caregivers'
+    | '/pets/$petId/health-records'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  MainRoute: typeof MainRoute
+  PetsPetIdRoute: typeof PetsPetIdRouteWithChildren
+  PetsNewRoute: typeof PetsNewRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  MainRoute: MainRoute,
+  PetsPetIdRoute: PetsPetIdRouteWithChildren,
+  PetsNewRoute: PetsNewRoute,
 }
 
 export const routeTree = rootRoute
@@ -116,18 +180,30 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about",
-        "/main"
+        "/pets/$petId",
+        "/pets/new"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/about": {
-      "filePath": "about.tsx"
+    "/pets/$petId": {
+      "filePath": "pets.$petId.tsx",
+      "children": [
+        "/pets/$petId/caregivers",
+        "/pets/$petId/health-records"
+      ]
     },
-    "/main": {
-      "filePath": "main.tsx"
+    "/pets/new": {
+      "filePath": "pets.new.tsx"
+    },
+    "/pets/$petId/caregivers": {
+      "filePath": "pets.$petId.caregivers.tsx",
+      "parent": "/pets/$petId"
+    },
+    "/pets/$petId/health-records": {
+      "filePath": "pets.$petId.health-records.tsx",
+      "parent": "/pets/$petId"
     }
   }
 }
