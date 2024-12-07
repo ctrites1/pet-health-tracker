@@ -58,7 +58,7 @@ const fakePets: Pet[] = [
 export const petsRoute = new Hono()
 	.get("/", async (c) => {
 		const pets = await db.select().from(petsTable);
-		console.log("");
+		console.log("pets: ", pets);
 
 		return c.json({ pets: pets });
 	})
