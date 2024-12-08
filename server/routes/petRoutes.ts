@@ -4,6 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 
 import { db } from "../db";
 import { pets as petsTable } from "server/db/schema/pets";
+import { eq, sql } from "drizzle-orm";
 
 const petSchema = z.object({
 	id: z.number().int().positive().min(1),
@@ -57,49 +58,60 @@ const fakePets: Pet[] = [
 
 export const petsRoute = new Hono()
 	.get("/", async (c) => {
-		const pets = await db.select().from(petsTable);
+		const pets = await db.select().from(petsTable); // returns array
 		console.log("pets: ", pets);
 
 		return c.json({ pets: pets });
 	})
+	// TODO: use db data
 	.post("/", zValidator("json", createPetSchema), async (c) => {
 		const data = await c.req.valid("json");
 		const pet = createPetSchema.parse(data);
 		c.status(201);
 
-		fakePets.push({ ...pet, id: fakePets.length + 1, imageUrl: "" });
-
 		return c.json(pet);
 	})
-	.get("/:id{[0-9]+}", (c) => {
-		const id = Number.parseInt(c.req.param("id"));
+	.get("/:id{[0-9]+}", async (c) => {
+		const paramId = Number.parseInt(c.req.param("id"));
 
-		const pet = fakePets.find((pet) => pet.id === id);
-		if (!pet) {
-			return c.notFound();
-		}
-		return c.json({ pet });
+		const result = await db
+			.select()
+			.from(petsTable)
+			.where(eq(petsTable.id, paramId));
+		const { id, name, species, breed, dateOfBirth, weight, ownerId, imageUrl } =
+			result[0];
+
+		return c.json({
+			id: id,
+			name: name,
+			species: species,
+			breed: breed,
+			dateOfBirth: dateOfBirth,
+			weight: weight,
+			ownerId: ownerId,
+			imageUrl: imageUrl,
+		});
 	})
-	.delete("/:id{[0-9]+}", (c) => {
-		const id = Number.parseInt(c.req.param("id"));
+	.delete("/:id{[0-9]+}", async (c) => {
+		const paramId = Number.parseInt(c.req.param("id"));
 
-		const index = fakePets.findIndex((pet) => pet.id === id);
-		if (index === -1) {
-			return c.notFound();
-		}
-		const deletedPet = fakePets.splice(index, 1)[0];
-		return c.json({ pet: deletedPet });
+		const petToDelete = await db
+			.select()
+			.from(petsTable)
+			.where(eq(petsTable.id, paramId));
+
+		await db.delete(petsTable).where(eq(petsTable.id, paramId));
+
+		return c.json({ deletedPet: petToDelete });
 	})
-	.get("/all-species", (c) => {
-		const counts = fakePets.reduce((acc, pet) => {
-			acc[pet.species] = (acc[pet.species] || 0) + 1;
-			return acc;
-		}, {} as Record<string, number>);
-
-		const speciesCounts = Object.entries(counts).map(([species, count]) => ({
-			species,
-			count,
-		}));
+	.get("/all-species", async (c) => {
+		const speciesCounts = await db
+			.select({
+				species: petsTable.species,
+				count: sql`count(${petsTable.species})`,
+			})
+			.from(petsTable)
+			.groupBy(petsTable.species);
 
 		return c.json({
 			speciesCounts: speciesCounts,
