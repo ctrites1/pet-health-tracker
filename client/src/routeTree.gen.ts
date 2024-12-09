@@ -11,130 +11,188 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as PetsNewImport } from './routes/pets.new'
-import { Route as PetsPetIdImport } from './routes/pets.$petId'
-import { Route as PetsPetIdHealthRecordsImport } from './routes/pets.$petId.health-records'
-import { Route as PetsPetIdCaregiversImport } from './routes/pets.$petId.caregivers'
+import { Route as AuthenticatedImport } from './routes/_authenticated'
+import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedProfileImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPetsNewImport } from './routes/_authenticated/pets.new'
+import { Route as AuthenticatedPetsPetIdImport } from './routes/_authenticated/pets.$petId'
+import { Route as AuthenticatedPetsPetIdHealthRecordsImport } from './routes/_authenticated/pets.$petId.health-records'
+import { Route as AuthenticatedPetsPetIdCaregiversImport } from './routes/_authenticated/pets.$petId.caregivers'
 
 // Create/Update Routes
 
-const IndexRoute = IndexImport.update({
+const AuthenticatedRoute = AuthenticatedImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const PetsNewRoute = PetsNewImport.update({
+const AuthenticatedProfileRoute = AuthenticatedProfileImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedPetsNewRoute = AuthenticatedPetsNewImport.update({
   id: '/pets/new',
   path: '/pets/new',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const PetsPetIdRoute = PetsPetIdImport.update({
+const AuthenticatedPetsPetIdRoute = AuthenticatedPetsPetIdImport.update({
   id: '/pets/$petId',
   path: '/pets/$petId',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const PetsPetIdHealthRecordsRoute = PetsPetIdHealthRecordsImport.update({
-  id: '/health-records',
-  path: '/health-records',
-  getParentRoute: () => PetsPetIdRoute,
-} as any)
+const AuthenticatedPetsPetIdHealthRecordsRoute =
+  AuthenticatedPetsPetIdHealthRecordsImport.update({
+    id: '/health-records',
+    path: '/health-records',
+    getParentRoute: () => AuthenticatedPetsPetIdRoute,
+  } as any)
 
-const PetsPetIdCaregiversRoute = PetsPetIdCaregiversImport.update({
-  id: '/caregivers',
-  path: '/caregivers',
-  getParentRoute: () => PetsPetIdRoute,
-} as any)
+const AuthenticatedPetsPetIdCaregiversRoute =
+  AuthenticatedPetsPetIdCaregiversImport.update({
+    id: '/caregivers',
+    path: '/caregivers',
+    getParentRoute: () => AuthenticatedPetsPetIdRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthenticatedIndexImport
+      parentRoute: typeof AuthenticatedImport
     }
-    '/pets/$petId': {
-      id: '/pets/$petId'
+    '/_authenticated/pets/$petId': {
+      id: '/_authenticated/pets/$petId'
       path: '/pets/$petId'
       fullPath: '/pets/$petId'
-      preLoaderRoute: typeof PetsPetIdImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthenticatedPetsPetIdImport
+      parentRoute: typeof AuthenticatedImport
     }
-    '/pets/new': {
-      id: '/pets/new'
+    '/_authenticated/pets/new': {
+      id: '/_authenticated/pets/new'
       path: '/pets/new'
       fullPath: '/pets/new'
-      preLoaderRoute: typeof PetsNewImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthenticatedPetsNewImport
+      parentRoute: typeof AuthenticatedImport
     }
-    '/pets/$petId/caregivers': {
-      id: '/pets/$petId/caregivers'
+    '/_authenticated/pets/$petId/caregivers': {
+      id: '/_authenticated/pets/$petId/caregivers'
       path: '/caregivers'
       fullPath: '/pets/$petId/caregivers'
-      preLoaderRoute: typeof PetsPetIdCaregiversImport
-      parentRoute: typeof PetsPetIdImport
+      preLoaderRoute: typeof AuthenticatedPetsPetIdCaregiversImport
+      parentRoute: typeof AuthenticatedPetsPetIdImport
     }
-    '/pets/$petId/health-records': {
-      id: '/pets/$petId/health-records'
+    '/_authenticated/pets/$petId/health-records': {
+      id: '/_authenticated/pets/$petId/health-records'
       path: '/health-records'
       fullPath: '/pets/$petId/health-records'
-      preLoaderRoute: typeof PetsPetIdHealthRecordsImport
-      parentRoute: typeof PetsPetIdImport
+      preLoaderRoute: typeof AuthenticatedPetsPetIdHealthRecordsImport
+      parentRoute: typeof AuthenticatedPetsPetIdImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface PetsPetIdRouteChildren {
-  PetsPetIdCaregiversRoute: typeof PetsPetIdCaregiversRoute
-  PetsPetIdHealthRecordsRoute: typeof PetsPetIdHealthRecordsRoute
+interface AuthenticatedPetsPetIdRouteChildren {
+  AuthenticatedPetsPetIdCaregiversRoute: typeof AuthenticatedPetsPetIdCaregiversRoute
+  AuthenticatedPetsPetIdHealthRecordsRoute: typeof AuthenticatedPetsPetIdHealthRecordsRoute
 }
 
-const PetsPetIdRouteChildren: PetsPetIdRouteChildren = {
-  PetsPetIdCaregiversRoute: PetsPetIdCaregiversRoute,
-  PetsPetIdHealthRecordsRoute: PetsPetIdHealthRecordsRoute,
+const AuthenticatedPetsPetIdRouteChildren: AuthenticatedPetsPetIdRouteChildren =
+  {
+    AuthenticatedPetsPetIdCaregiversRoute:
+      AuthenticatedPetsPetIdCaregiversRoute,
+    AuthenticatedPetsPetIdHealthRecordsRoute:
+      AuthenticatedPetsPetIdHealthRecordsRoute,
+  }
+
+const AuthenticatedPetsPetIdRouteWithChildren =
+  AuthenticatedPetsPetIdRoute._addFileChildren(
+    AuthenticatedPetsPetIdRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedPetsPetIdRoute: typeof AuthenticatedPetsPetIdRouteWithChildren
+  AuthenticatedPetsNewRoute: typeof AuthenticatedPetsNewRoute
 }
 
-const PetsPetIdRouteWithChildren = PetsPetIdRoute._addFileChildren(
-  PetsPetIdRouteChildren,
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedPetsPetIdRoute: AuthenticatedPetsPetIdRouteWithChildren,
+  AuthenticatedPetsNewRoute: AuthenticatedPetsNewRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
 )
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/pets/$petId': typeof PetsPetIdRouteWithChildren
-  '/pets/new': typeof PetsNewRoute
-  '/pets/$petId/caregivers': typeof PetsPetIdCaregiversRoute
-  '/pets/$petId/health-records': typeof PetsPetIdHealthRecordsRoute
+  '': typeof AuthenticatedRouteWithChildren
+  '/profile': typeof AuthenticatedProfileRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/pets/$petId': typeof AuthenticatedPetsPetIdRouteWithChildren
+  '/pets/new': typeof AuthenticatedPetsNewRoute
+  '/pets/$petId/caregivers': typeof AuthenticatedPetsPetIdCaregiversRoute
+  '/pets/$petId/health-records': typeof AuthenticatedPetsPetIdHealthRecordsRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/pets/$petId': typeof PetsPetIdRouteWithChildren
-  '/pets/new': typeof PetsNewRoute
-  '/pets/$petId/caregivers': typeof PetsPetIdCaregiversRoute
-  '/pets/$petId/health-records': typeof PetsPetIdHealthRecordsRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/pets/$petId': typeof AuthenticatedPetsPetIdRouteWithChildren
+  '/pets/new': typeof AuthenticatedPetsNewRoute
+  '/pets/$petId/caregivers': typeof AuthenticatedPetsPetIdCaregiversRoute
+  '/pets/$petId/health-records': typeof AuthenticatedPetsPetIdHealthRecordsRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/pets/$petId': typeof PetsPetIdRouteWithChildren
-  '/pets/new': typeof PetsNewRoute
-  '/pets/$petId/caregivers': typeof PetsPetIdCaregiversRoute
-  '/pets/$petId/health-records': typeof PetsPetIdHealthRecordsRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/pets/$petId': typeof AuthenticatedPetsPetIdRouteWithChildren
+  '/_authenticated/pets/new': typeof AuthenticatedPetsNewRoute
+  '/_authenticated/pets/$petId/caregivers': typeof AuthenticatedPetsPetIdCaregiversRoute
+  '/_authenticated/pets/$petId/health-records': typeof AuthenticatedPetsPetIdHealthRecordsRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | ''
+    | '/profile'
     | '/'
     | '/pets/$petId'
     | '/pets/new'
@@ -142,6 +200,7 @@ export interface FileRouteTypes {
     | '/pets/$petId/health-records'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/profile'
     | '/'
     | '/pets/$petId'
     | '/pets/new'
@@ -149,24 +208,22 @@ export interface FileRouteTypes {
     | '/pets/$petId/health-records'
   id:
     | '__root__'
-    | '/'
-    | '/pets/$petId'
-    | '/pets/new'
-    | '/pets/$petId/caregivers'
-    | '/pets/$petId/health-records'
+    | '/_authenticated'
+    | '/_authenticated/profile'
+    | '/_authenticated/'
+    | '/_authenticated/pets/$petId'
+    | '/_authenticated/pets/new'
+    | '/_authenticated/pets/$petId/caregivers'
+    | '/_authenticated/pets/$petId/health-records'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PetsPetIdRoute: typeof PetsPetIdRouteWithChildren
-  PetsNewRoute: typeof PetsNewRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  PetsPetIdRoute: PetsPetIdRouteWithChildren,
-  PetsNewRoute: PetsNewRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -179,31 +236,45 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/pets/$petId",
-        "/pets/new"
+        "/_authenticated"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/pets/$petId": {
-      "filePath": "pets.$petId.tsx",
+    "/_authenticated": {
+      "filePath": "_authenticated.tsx",
       "children": [
-        "/pets/$petId/caregivers",
-        "/pets/$petId/health-records"
+        "/_authenticated/profile",
+        "/_authenticated/",
+        "/_authenticated/pets/$petId",
+        "/_authenticated/pets/new"
       ]
     },
-    "/pets/new": {
-      "filePath": "pets.new.tsx"
+    "/_authenticated/profile": {
+      "filePath": "_authenticated/profile.tsx",
+      "parent": "/_authenticated"
     },
-    "/pets/$petId/caregivers": {
-      "filePath": "pets.$petId.caregivers.tsx",
-      "parent": "/pets/$petId"
+    "/_authenticated/": {
+      "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
     },
-    "/pets/$petId/health-records": {
-      "filePath": "pets.$petId.health-records.tsx",
-      "parent": "/pets/$petId"
+    "/_authenticated/pets/$petId": {
+      "filePath": "_authenticated/pets.$petId.tsx",
+      "parent": "/_authenticated",
+      "children": [
+        "/_authenticated/pets/$petId/caregivers",
+        "/_authenticated/pets/$petId/health-records"
+      ]
+    },
+    "/_authenticated/pets/new": {
+      "filePath": "_authenticated/pets.new.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/pets/$petId/caregivers": {
+      "filePath": "_authenticated/pets.$petId.caregivers.tsx",
+      "parent": "/_authenticated/pets/$petId"
+    },
+    "/_authenticated/pets/$petId/health-records": {
+      "filePath": "_authenticated/pets.$petId.health-records.tsx",
+      "parent": "/_authenticated/pets/$petId"
     }
   }
 }

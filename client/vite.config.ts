@@ -10,6 +10,9 @@ export default defineConfig({
 		alias: {
 			"@": path.resolve(__dirname, "./src"),
 			"@server": path.resolve(__dirname, "../server"),
+			server: path.resolve(__dirname, "../server"),
+			"@shared": path.resolve(__dirname, "../shared"),
+			shared: path.resolve(__dirname, "../shared"),
 		},
 	},
 	server: {
@@ -18,6 +21,11 @@ export default defineConfig({
 				target: "http://localhost:3000",
 				changeOrigin: true,
 			},
+		},
+	},
+	build: {
+		rollupOptions: {
+			external: ["@shared/types/petEnums"],
 		},
 	},
 });

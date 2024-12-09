@@ -10,14 +10,18 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { PetSpecies } from "@shared/types/petEnum";
+import { createPetSchema } from "@server/sharedTypes";
 
-export const Route = createFileRoute("/pets/new")({
+export const Route = createFileRoute("/_authenticated/pets/new")({
 	component: NewPet,
 });
 
 function NewPet() {
 	const [preview] = useState<string | null>(null);
 	const form = useForm({
+		validatorAdapter: zodValidator(),
 		defaultValues: {
 			name: "",
 			species: "",
@@ -61,6 +65,9 @@ function NewPet() {
 					<div>
 						<form.Field
 							name="name"
+							validators={{
+								onChange: createPetSchema.shape.name,
+							}}
 							children={(field) => {
 								return (
 									<>
@@ -90,6 +97,7 @@ function NewPet() {
 					<div>
 						<form.Field
 							name="species"
+							validators={{ onChange: createPetSchema.shape.species }}
 							children={(field) => {
 								return (
 									<>
@@ -107,11 +115,11 @@ function NewPet() {
 												<SelectValue placeholder="Select species" />
 											</SelectTrigger>
 											<SelectContent>
-												<SelectItem value="dog">Dog</SelectItem>
-												<SelectItem value="cat">Cat</SelectItem>
-												<SelectItem value="rabbit">Rabbit</SelectItem>
-												<SelectItem value="bird">Bird</SelectItem>
-												<SelectItem value="other">Other</SelectItem>
+												{Object.values(PetSpecies).map((species) => (
+													<SelectItem key={species} value={species}>
+														{species}
+													</SelectItem>
+												))}
 											</SelectContent>
 										</Select>
 
@@ -128,6 +136,7 @@ function NewPet() {
 					<div>
 						<form.Field
 							name="breed"
+							validators={{ onChange: createPetSchema.shape.breed }}
 							children={(field) => (
 								<>
 									<Label
@@ -153,6 +162,7 @@ function NewPet() {
 					<div>
 						<form.Field
 							name="dateOfBirth"
+							validators={{ onChange: createPetSchema.shape.dateOfBirth }}
 							children={(field) => (
 								<>
 									<Label
@@ -178,6 +188,7 @@ function NewPet() {
 					<div>
 						<form.Field
 							name="weight"
+							validators={{ onChange: createPetSchema.shape.weight }}
 							children={(field) => (
 								<>
 									<Label
@@ -212,7 +223,7 @@ function NewPet() {
 					</button>
 					<button
 						type="submit"
-						className="px-6 py-2 rounded-lg border border-logo-green-dark bg-logo-green text-white text-base hover:-translate-y-1 transform transition duration-200 hover:shadow-md"
+						className="px-6 py-2 rounded-lg border border-logo-green-dark bg-logo-green text-white text-base hover:-translate-y-1 transform transition duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						Add Pet
 					</button>

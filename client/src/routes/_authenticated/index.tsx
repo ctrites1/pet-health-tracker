@@ -4,7 +4,7 @@ import PetCard from "@/components/PetCard";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
 	component: Index,
 });
 
@@ -14,6 +14,7 @@ async function getAllPets() {
 		throw new Error("Server Error");
 	}
 	const data = await res.json();
+
 	return data.pets;
 }
 

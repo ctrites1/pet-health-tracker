@@ -1,5 +1,14 @@
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import { QueryClient } from "@tanstack/react-query";
+import {
+	createRootRouteWithContext,
+	Link,
+	Outlet,
+} from "@tanstack/react-router";
 // import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+
+interface MyRouterContext {
+	queryClient: QueryClient;
+}
 
 function NavBar() {
 	return (
@@ -23,27 +32,28 @@ function NavBar() {
 								+Pet
 							</Link>
 						</h2>
-						{/* TODO: Implement auth buttons */}
-						{/* <div className="flex items-center gap-4">
-							<Link
-								to="/login"
+						<h2 className="text-xl font-bold">
+							<Link to="/profile" className="text-white hover:text-logo-green">
+								Profile
+							</Link>
+						</h2>
+						{/* TODO: Implement auth buttons with logout button option if someone is logged in */}
+						<div className="flex items-center gap-4">
+							<a
+								href="/api/login"
 								className="px-4 py-2 rounded-md text-white hover:bg-logo-green transition-colors duration-200"
 							>
 								Sign In
-							</Link>
-							<Link
-								to="/register"
-								className="px-4 py-2 rounded-md bg-logo-green text-white hover:bg-opacity-90 transition-colors duration-200"
+							</a>
+							<a
+								href="/api/register"
+								className="px-4 py-2 rounded-md bg-logo-green-dark text-white hover:bg-opacity-80 transition-colors duration-200"
 							>
 								Register
-							</Link>
-						</div> */}
+							</a>
+						</div>
 					</div>
 				</div>
-
-				{/* 
-				TODO: Add Auth to navbar
-			*/}
 			</div>
 		</nav>
 	);
@@ -60,6 +70,6 @@ function Root() {
 	);
 }
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<MyRouterContext>()({
 	component: Root,
 });
