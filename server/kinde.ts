@@ -6,14 +6,14 @@ import {
 } from "@kinde-oss/kinde-typescript-sdk";
 import { type Context } from "hono";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
-import { createFactory, createMiddleware } from "hono/factory";
+import { createMiddleware } from "hono/factory";
 
 export const kindeClient = createKindeServerClient(
 	GrantType.AUTHORIZATION_CODE,
 	{
-		authDomain: process.env.KINDE_AUTH_DOMAIN!,
+		authDomain: process.env.KINDE_ISSUER_URL!,
 		clientId: process.env.KINDE_CLIENT_ID!,
-		clientSecret: process.env.KINDE_SECRET!,
+		clientSecret: process.env.KINDE_CLIENT_SECRET!,
 		redirectURL: process.env.KINDE_REDIRECT_URL!,
 		logoutRedirectURL: process.env.KINDE_LOGOUT_REDIRECT_URL!,
 	}
@@ -40,11 +40,11 @@ export const sessionManager = (c: Context): SessionManager => ({
 		}
 	},
 	async removeSessionItem(key: string) {
-		deleteCookie(c, key);
+		deleteCookie(c, key, { path: "/" });
 	},
 	async destroySession() {
 		["id_token", "access_token", "user", "refresh_token"].forEach((key) => {
-			deleteCookie(c, key);
+			deleteCookie(c, key, { path: "/" });
 		});
 	},
 });

@@ -2,7 +2,7 @@ import { hc } from "hono/client";
 import type { ApiRoutes } from "@server/app";
 import { queryOptions } from "@tanstack/react-query";
 
-const client = hc<ApiRoutes>("/");
+const client = hc<ApiRoutes>("");
 
 export const api = client.api;
 

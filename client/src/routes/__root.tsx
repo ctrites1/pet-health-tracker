@@ -1,3 +1,4 @@
+import { userQueryOptions } from "@/lib/api";
 import { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
@@ -36,20 +37,13 @@ function NavBar() {
 								Profile
 							</Link>
 						</h2>
-						{/* TODO: Implement auth buttons with logout button option if someone is logged in */}
 					</div>
 					<div className="flex items-center gap-4">
 						<a
-							href="/api/login"
+							href="/api/logout"
 							className="px-4 py-2 rounded-md text-white hover:bg-logo-green transition-colors duration-200"
 						>
-							Sign In
-						</a>
-						<a
-							href="/api/register"
-							className="px-4 py-2 rounded-md bg-logo-green-dark text-white hover:bg-opacity-80 transition-colors duration-200"
-						>
-							Register
+							Logout
 						</a>
 					</div>
 				</div>
@@ -59,16 +53,30 @@ function NavBar() {
 }
 
 function Root() {
+	const { user } = Route.useRouteContext();
+
 	return (
 		<>
-			<NavBar />
+			{user && <NavBar />}
 			<hr />
 			<Outlet />
-			{/* <TanStackRouterDevtools /> */}
 		</>
 	);
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+	beforeLoad: async ({ context }) => {
+		const queryClient = context.queryClient;
+		try {
+			const data = await queryClient.fetchQuery(userQueryOptions);
+			return data;
+		} catch (e) {
+			console.error(e);
+			return { user: null };
+		}
+	},
 	component: Root,
+	notFoundComponent: () => {
+		return <p>This page doesn't exist!</p>;
+	},
 });

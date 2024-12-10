@@ -7,8 +7,13 @@ import { eq } from "drizzle-orm";
 
 export const authRoute = new Hono()
 	.get("/login", async (c) => {
-		const loginUrl = await kindeClient.login(sessionManager(c));
-		return c.redirect(loginUrl.toString());
+		try {
+			const loginUrl = await kindeClient.login(sessionManager(c));
+			return c.text(loginUrl.toString());
+		} catch (error) {
+			console.error("Login URL generation error:", error);
+			return c.json({ error: "Failed to generate login URL" }, 500);
+		}
 	})
 
 	.get("/register", async (c) => {
@@ -18,9 +23,13 @@ export const authRoute = new Hono()
 
 	.get("/callback", async (c) => {
 		try {
-			// called every time someone logs in or registers
-			// handle adding new user to db here
 			const url = new URL(c.req.url);
+			console.log("Callback URL:", url.toString()); // Debug logging
+			const code = url.searchParams.get("code"); // more debugging
+			if (!code) {
+				console.error("No auth code found in callback URL");
+				return c.redirect("/login?error=no_code");
+			}
 			await kindeClient.handleRedirectToApp(sessionManager(c), url);
 
 			const profile = await kindeClient.getUserProfile(sessionManager(c));
