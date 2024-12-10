@@ -8,6 +8,18 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/pets/$petId")({
 	component: PetPage,
@@ -127,6 +139,22 @@ function PetPage() {
 
 		form.handleSubmit();
 	};
+	const deletePet = async () => {
+		try {
+			const response = await fetch(`/api/pets/${petId}`, {
+				method: "DELETE",
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to delete pet");
+			}
+			toast.success(`Successfully deleted ${pet.name}`);
+			queryClient.invalidateQueries({ queryKey: ["pets"] });
+			window.location.href = "/";
+		} catch (e) {
+			toast.error("Failed to delete pet. Error: ");
+		}
+	};
 
 	return (
 		<div className="max-w-4xl mx-auto p-6">
@@ -237,20 +265,31 @@ function PetPage() {
 					</Button>
 				</div>
 				<div className="mt-8">
-					<Button
-						className="bg-red-600 border-red-900 hover:bg-red-800"
-						onClick={async () => {
-							if (confirm("Are you sure you want to delete this pet?")) {
-								await fetch(`/api/pets/${petId}`, {
-									method: "DELETE",
-								});
-								queryClient.invalidateQueries({ queryKey: ["pets"] });
-								window.location.href = "/";
-							}
-						}}
-					>
-						Delete Pet
-					</Button>
+					<AlertDialog>
+						<AlertDialogTrigger asChild>
+							<Button className="bg-red-600 border-red-900 hover:bg-red-800">
+								Delete Pet
+							</Button>
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>Delete {pet.name}?</AlertDialogTitle>
+								<AlertDialogDescription>
+									This action cannot be undone. This will permanently delete{" "}
+									{pet.name}'s profile and all associated records.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Cancel</AlertDialogCancel>
+								<AlertDialogAction
+									onClick={deletePet}
+									className="bg-red-600 hover:bg-red-700"
+								>
+									Delete Pet
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
 				</div>
 			</div>
 		</div>
