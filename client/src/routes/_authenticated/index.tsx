@@ -27,6 +27,15 @@ async function getSpeciesCount() {
 	return data;
 }
 
+async function getUserData() {
+	const res = await api.me.$get();
+	if (!res.ok) {
+		throw new Error("Server Error");
+	}
+	const data = await res.json();
+	return data.user;
+}
+
 function Index() {
 	const {
 		data: speciesData,
@@ -46,11 +55,25 @@ function Index() {
 		queryFn: getAllPets,
 	});
 
-	if (speciesError || petsError) {
-		return <div>Error: {speciesError?.message || petsError?.message}</div>;
+	const {
+		data: userData,
+		isPending: isUserPending,
+		error: userError,
+	} = useQuery({
+		queryKey: ["user"],
+		queryFn: getUserData,
+	});
+
+	if (speciesError || petsError || userError) {
+		return (
+			<div>
+				Error:{" "}
+				{speciesError?.message || petsError?.message || userError?.message}
+			</div>
+		);
 	}
 
-	if (isPetsPending || isSpeciesPending) {
+	if (isPetsPending || isSpeciesPending || isUserPending) {
 		return <div>Loading...</div>;
 	}
 
@@ -67,7 +90,9 @@ function Index() {
 		<div className="flex flex-col min-h-screen bg-background">
 			<main className="flex-1 p-8">
 				<div className="mb-8">
-					<h2 className="text-2xl font-bold mb-6">Pets</h2>
+					<h2 className="text-2xl font-bold mb-6">
+						{userData?.given_name ? `${userData.given_name}'s Pets` : "Pets"}
+					</h2>
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{petsData.map((pet) => (
 							<PetCard key={pet.id} pet={pet} />
