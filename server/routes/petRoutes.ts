@@ -29,11 +29,17 @@ export const petsRoute = new Hono()
 		const validatedPet = insertPetSchema.parse({
 			...newPet,
 			dateOfBirth: newPet.dateOfBirth?.toString(),
-			weight: newPet.weight?.toString(),
+			weight: newPet.weight,
 			ownerId: user.id,
 		});
 
-		const result = await db.insert(petsTable).values(validatedPet).returning();
+		const result = await db
+			.insert(petsTable)
+			.values({
+				...validatedPet,
+				weight: validatedPet.weight?.toString(),
+			})
+			.returning();
 
 		c.status(201);
 		return c.json(result);

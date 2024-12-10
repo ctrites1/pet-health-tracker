@@ -4,7 +4,6 @@ import {
 	Link,
 	Outlet,
 } from "@tanstack/react-router";
-// import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -14,7 +13,7 @@ function NavBar() {
 	return (
 		<nav className="bg-gray-800 p-2">
 			<div className="container mx-auto">
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between w-full">
 					<div className="flex items-center gap-8">
 						<img
 							src="/petfolio-logo.svg"
@@ -27,31 +26,31 @@ function NavBar() {
 							</Link>
 						</h2>
 
-						<h2 className="text-xl font-bold">
+						<h2 className="text-xl font-normal">
 							<Link to="/pets/new" className="text-white hover:text-logo-green">
 								+Pet
 							</Link>
 						</h2>
-						<h2 className="text-xl font-bold">
+						<h2 className="text-xl font-normal">
 							<Link to="/profile" className="text-white hover:text-logo-green">
 								Profile
 							</Link>
 						</h2>
 						{/* TODO: Implement auth buttons with logout button option if someone is logged in */}
-						<div className="flex items-center gap-4">
-							<a
-								href="/api/login"
-								className="px-4 py-2 rounded-md text-white hover:bg-logo-green transition-colors duration-200"
-							>
-								Sign In
-							</a>
-							<a
-								href="/api/register"
-								className="px-4 py-2 rounded-md bg-logo-green-dark text-white hover:bg-opacity-80 transition-colors duration-200"
-							>
-								Register
-							</a>
-						</div>
+					</div>
+					<div className="flex items-center gap-4">
+						<a
+							href="/api/login"
+							className="px-4 py-2 rounded-md text-white hover:bg-logo-green transition-colors duration-200"
+						>
+							Sign In
+						</a>
+						<a
+							href="/api/register"
+							className="px-4 py-2 rounded-md bg-logo-green-dark text-white hover:bg-opacity-80 transition-colors duration-200"
+						>
+							Register
+						</a>
 					</div>
 				</div>
 			</div>

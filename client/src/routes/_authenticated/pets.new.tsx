@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -13,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { PetSpecies } from "@shared/types/petEnum";
 import { createPetSchema } from "@server/sharedTypes";
+import { useNavigate } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/pets/new")({
 	component: NewPet,
@@ -20,6 +22,36 @@ export const Route = createFileRoute("/_authenticated/pets/new")({
 
 function NewPet() {
 	const [preview] = useState<string | null>(null);
+	const navigate = useNavigate();
+
+	const addPetMutation = useMutation({
+		mutationFn: async (petData: typeof createPetSchema._type) => {
+			const formattedData = {
+				...petData,
+				weight: petData.weight ? Number(petData.weight) : null,
+			};
+
+			const res = await fetch("/api/pets", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(formattedData),
+			});
+
+			if (!res.ok) {
+				const error = await res.json();
+				console.log("Server error details:", error); // Error handling
+				throw new Error(error.message || "Failed to add pet");
+			}
+
+			return res.json();
+		},
+		onSuccess: () => {
+			navigate({ to: "/" });
+		},
+	});
+
 	const form = useForm({
 		validatorAdapter: zodValidator(),
 		defaultValues: {
@@ -28,25 +60,35 @@ function NewPet() {
 			breed: "",
 			dateOfBirth: "",
 			weight: 0,
-			imageUrl: "",
+			imageUrl: null,
 		},
 		onSubmit: async ({ value }) => {
-			// Do something with form data
 			console.log(value);
+			try {
+				await addPetMutation.mutateAsync(value);
+			} catch (e) {
+				console.error("Failed to add pet: ", e);
+			}
 		},
 	});
+
+	const handleSubmit = useCallback(
+		async (e: React.FormEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+
+			const isValid = await form.validate("submit");
+			if (!isValid) return;
+
+			form.handleSubmit();
+		},
+		[form]
+	);
 
 	return (
 		<div className="max-w-2xl mx-auto p-6">
 			<h1 className="text-3xl font-semibold mb-6">Add a New Pet</h1>
-			<form
-				onSubmit={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-					form.handleSubmit();
-				}}
-				className="space-y-6"
-			>
+			<form onSubmit={handleSubmit} className="space-y-6">
 				<div className="flex justify-center mb-6">
 					<div className="w-32 h-32 border-2 border-dashed rounded-full flex items-center justify-center overflow-hidden">
 						{preview ? (
@@ -211,6 +253,11 @@ function NewPet() {
 							)}
 						/>
 					</div>
+					{addPetMutation.error && (
+						<div className="text-red-500 mb-4">
+							{addPetMutation.error.message}
+						</div>
+					)}
 				</div>
 
 				<div className="flex justify-end gap-4">
@@ -218,14 +265,31 @@ function NewPet() {
 						type="button"
 						onClick={() => form.reset()}
 						className="px-6 py-2 rounded-lg border border-gray-200 bg-gray-50 text-black text-base hover:-translate-y-1 transform transition duration-200 hover:shadow-md"
+						disabled={addPetMutation.isPending}
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
-						className="px-6 py-2 rounded-lg border border-logo-green-dark bg-logo-green text-white text-base hover:-translate-y-1 transform transition duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+						onClick={() => form.handleSubmit()}
+						className={`
+							px-6 py-2 rounded-lg border
+							${
+								addPetMutation.isPending
+									? "border-gray-300 bg-gray-100 text-gray-500"
+									: "border-logo-green bg-logo-green text-white"
+							}
+							text-base 
+							hover:not:disabled:-translate-y-1 
+							transform transition duration-200 
+							hover:not:disabled:shadow-md 
+							disabled:opacity-50 
+							disabled:cursor-not-allowed
+							disabled:hover:transform-none
+						  `}
+						disabled={addPetMutation.isPending}
 					>
-						Add Pet
+						{addPetMutation.isPending ? "Adding Pet..." : "Add Pet"}
 					</button>
 				</div>
 			</form>

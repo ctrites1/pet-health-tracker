@@ -1,4 +1,5 @@
 import { pgTable, varchar, text, index } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
 
 export const users = pgTable(
 	"users",
@@ -13,3 +14,5 @@ export const users = pgTable(
 		};
 	}
 );
+
+export const userInsertSchema = createInsertSchema(users);
