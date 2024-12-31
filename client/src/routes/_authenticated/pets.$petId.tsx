@@ -258,7 +258,6 @@ function PetPage() {
 
 			<div className="flex flex-row items-center justify-between">
 				<div className="mt-8 flex gap-4">
-					{/* Here!!! */}
 					<Button asChild variant="default">
 						<Link to="/pets/$petId/caregivers" params={{ petId: petId }}>
 							Caregivers

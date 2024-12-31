@@ -5,6 +5,8 @@ import { pets as petsTable, insertPetSchema } from "server/db/schema/pets";
 import { eq, sql } from "drizzle-orm";
 import { getUser } from "server/kinde";
 import { createPetSchema } from "server/sharedTypes";
+import { healthRecords as healthRecordsTable } from "server/db/schema/healthRecords";
+import { vetContacts as vetContactsTable } from "server/db/schema/vetContacts";
 
 export const petsRoute = new Hono()
 	.get("/", getUser, async (c) => {
@@ -105,20 +107,26 @@ export const petsRoute = new Hono()
 		const paramId = Number.parseInt(c.req.param("id"));
 
 		const result = await db
-			.select()
-			.from(petsTable)
-			.where(eq(petsTable.id, paramId));
-		const { id, name, species, breed, dateOfBirth, weight, ownerId, imageUrl } =
-			result[0];
+			.select({
+				id: healthRecordsTable.id,
+				visitDate: healthRecordsTable.visitDate,
+				diagnosis: healthRecordsTable.diagnosis,
+				treatment: healthRecordsTable.treatment,
+				notes: healthRecordsTable.notes,
+				vet: {
+					name: vetContactsTable.name,
+					clinic: vetContactsTable.clinicName,
+					address: vetContactsTable.clinicAddress,
+					email: vetContactsTable.clinicEmail,
+					phone: vetContactsTable.clinicPhone,
+				},
+			})
+			.from(healthRecordsTable)
+			.where(eq(healthRecordsTable.petId, paramId))
+			.leftJoin(
+				vetContactsTable,
+				eq(healthRecordsTable.vetId, vetContactsTable.id)
+			);
 
-		return c.json({
-			id: id,
-			name: name,
-			species: species,
-			breed: breed,
-			dateOfBirth: dateOfBirth,
-			weight: weight,
-			ownerId: ownerId,
-			imageUrl: imageUrl,
-		});
+		return c.json(result);
 	});
