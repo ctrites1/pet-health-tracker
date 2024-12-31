@@ -100,4 +100,25 @@ export const petsRoute = new Hono()
 				500
 			);
 		}
+	})
+	.get("/:id{[0-9]+}/health-records", getUser, async (c) => {
+		const paramId = Number.parseInt(c.req.param("id"));
+
+		const result = await db
+			.select()
+			.from(petsTable)
+			.where(eq(petsTable.id, paramId));
+		const { id, name, species, breed, dateOfBirth, weight, ownerId, imageUrl } =
+			result[0];
+
+		return c.json({
+			id: id,
+			name: name,
+			species: species,
+			breed: breed,
+			dateOfBirth: dateOfBirth,
+			weight: weight,
+			ownerId: ownerId,
+			imageUrl: imageUrl,
+		});
 	});

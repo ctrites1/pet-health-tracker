@@ -20,6 +20,7 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/pets/$petId")({
 	component: PetPage,
@@ -257,11 +258,17 @@ function PetPage() {
 
 			<div className="flex flex-row items-center justify-between">
 				<div className="mt-8 flex gap-4">
+					{/* Here!!! */}
 					<Button asChild variant="default">
-						<a href={`/pets/${petId}/caregivers`}>Manage Caregivers</a>
+						<Link to="/pets/$petId/caregivers" params={{ petId: petId }}>
+							Caregivers
+						</Link>
 					</Button>
+
 					<Button asChild variant="default">
-						<a href={`/pets/${petId}/health-records`}>Health Records</a>
+						<Link to="/pets/$petId/health-records" params={{ petId: petId }}>
+							Health Records
+						</Link>
 					</Button>
 				</div>
 				<div className="mt-8">
