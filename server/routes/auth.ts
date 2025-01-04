@@ -24,39 +24,8 @@ export const authRoute = new Hono()
 	.get("/callback", async (c) => {
 		try {
 			const url = new URL(c.req.url);
-			console.log("Callback URL:", url.toString()); // Debug logging
-			const code = url.searchParams.get("code"); // more debugging
-			if (!code) {
-				console.error("No auth code found in callback URL");
-				return c.redirect("/login?error=no_code");
-			}
+
 			await kindeClient.handleRedirectToApp(sessionManager(c), url);
-
-			const profile = await kindeClient.getUserProfile(sessionManager(c));
-
-			if (profile) {
-				const [existingUser] = await db
-					.select()
-					.from(usersTable)
-					.where(eq(usersTable.id, profile.id));
-
-				const userData = {
-					id: profile.id,
-					name: profile.given_name || profile.email.split("@")[0],
-					email: profile.email,
-				};
-
-				const parsedUser = userInsertSchema.parse(userData);
-
-				if (!existingUser) {
-					await db.insert(usersTable).values(parsedUser);
-				} else {
-					await db
-						.update(usersTable)
-						.set(parsedUser)
-						.where(eq(usersTable.id, profile.id));
-				}
-			}
 
 			return c.redirect("/");
 		} catch (e) {
@@ -71,6 +40,34 @@ export const authRoute = new Hono()
 	})
 
 	.get("/me", getUser, async (c) => {
-		const user = c.var.user;
-		return c.json({ user: user });
+		try {
+			const user = c.var.user;
+
+			const [existingUser] = await db
+				.select()
+				.from(usersTable)
+				.where(eq(usersTable.id, user.id));
+
+			const userData = {
+				id: user.id,
+				name: user.given_name || user.email.split("@")[0],
+				email: user.email,
+			};
+
+			const parsedUser = userInsertSchema.parse(userData);
+
+			if (!existingUser) {
+				await db.insert(usersTable).values(parsedUser);
+			} else {
+				await db
+					.update(usersTable)
+					.set(parsedUser)
+					.where(eq(usersTable.id, user.id));
+			}
+
+			return c.json({ user });
+		} catch (e) {
+			console.error("Error syncing user: ", e);
+			return c.json({ user: c.var.user });
+		}
 	});

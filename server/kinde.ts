@@ -24,19 +24,23 @@ let store: Record<string, unknown> = {};
 export const sessionManager = (c: Context): SessionManager => ({
 	async getSessionItem(key: string) {
 		const result = getCookie(c, key);
+		console.log(`Getting ${key}:`, result ? "exists" : "missing");
 		return result;
 	},
 	async setSessionItem(key: string, value: unknown) {
+		console.log(`Setting ${key}`);
 		const cookieOptions = {
 			httpOnly: true,
 			secure: true,
 			sameSite: "Lax",
+			path: "/",
+			maxAge: 60 * 60 * 24 * 7, // 1 week
 		} as const;
 
 		if (typeof value === "string") {
-			setCookie(c, key, value, cookieOptions);
+			await setCookie(c, key, value, cookieOptions);
 		} else {
-			setCookie(c, key, JSON.stringify(value), cookieOptions);
+			await setCookie(c, key, JSON.stringify(value), cookieOptions);
 		}
 	},
 	async removeSessionItem(key: string) {
