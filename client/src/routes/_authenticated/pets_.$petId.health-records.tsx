@@ -25,7 +25,7 @@ export const Route = createFileRoute(
 	component: HealthRecords,
 });
 
-interface VetInfo {
+export interface VetContact {
 	name: string;
 	clinic: string;
 	address: string;
@@ -40,7 +40,7 @@ interface HealthRecord {
 	diagnosis: string;
 	treatment: string;
 	notes: string;
-	vet: VetInfo;
+	vet: VetContact;
 }
 
 interface Response {

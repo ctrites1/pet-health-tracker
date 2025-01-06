@@ -7,6 +7,7 @@ import { getUser } from "server/kinde";
 import { createPetSchema } from "server/sharedTypes";
 import { healthRecords as healthRecordsTable } from "server/db/schema/healthRecords";
 import { vetContacts as vetContactsTable } from "server/db/schema/vetContacts";
+import { emergencyContacts as emergencyContactsTable } from "server/db/schema/emergencyContacts";
 
 export const petsRoute = new Hono()
 	.get("/", getUser, async (c) => {
@@ -138,5 +139,85 @@ export const petsRoute = new Hono()
 		return c.json({
 			name: nameResult[0].name,
 			records: recordsResults,
+		});
+	})
+	.get("/:id{[0-9]+}/health-records", getUser, async (c) => {
+		const paramId = Number.parseInt(c.req.param("id"));
+
+		const nameResult = await db
+			.select({
+				name: petsTable.name,
+			})
+			.from(petsTable)
+			.where(eq(petsTable.id, paramId));
+
+		const recordsResults = await db
+			.select({
+				id: healthRecordsTable.id,
+				visitDate: healthRecordsTable.visitDate,
+				diagnosis: healthRecordsTable.diagnosis,
+				treatment: healthRecordsTable.treatment,
+				notes: healthRecordsTable.notes,
+				vet: {
+					name: vetContactsTable.name,
+					clinic: vetContactsTable.clinicName,
+					address: vetContactsTable.clinicAddress,
+					email: vetContactsTable.clinicEmail,
+					phone: vetContactsTable.clinicPhone,
+				},
+			})
+			.from(healthRecordsTable)
+			.where(eq(healthRecordsTable.petId, paramId))
+			.leftJoin(
+				vetContactsTable,
+				eq(healthRecordsTable.vetId, vetContactsTable.id)
+			);
+
+		return c.json({
+			name: nameResult[0].name,
+			records: recordsResults,
+		});
+	})
+	.get("/:id{[0-9]+}/caregivers", getUser, async (c) => {
+		const paramId = Number.parseInt(c.req.param("id"));
+
+		const nameResult = await db
+			.select({
+				name: petsTable.name,
+			})
+			.from(petsTable)
+			.where(eq(petsTable.id, paramId));
+
+		const vetResults = await db
+			.select({
+				id: vetContactsTable.id,
+				name: vetContactsTable.name,
+				clinic: vetContactsTable.clinicName,
+				address: vetContactsTable.clinicAddress,
+				email: vetContactsTable.clinicEmail,
+				phone: vetContactsTable.clinicPhone,
+			})
+			.from(vetContactsTable)
+			.where(eq(healthRecordsTable.petId, paramId))
+			.leftJoin(
+				healthRecordsTable,
+				eq(vetContactsTable.id, healthRecordsTable.vetId)
+			);
+		const emergContactResults = await db
+			.select({
+				id: emergencyContactsTable.id,
+				name: emergencyContactsTable.name,
+				relationship: emergencyContactsTable.relationship,
+				phone: emergencyContactsTable.phone,
+				email: emergencyContactsTable.email,
+				isPrimary: emergencyContactsTable.isPrimary,
+			})
+			.from(emergencyContactsTable)
+			.where(eq(emergencyContactsTable.petId, paramId));
+
+		return c.json({
+			name: nameResult[0].name,
+			vets: vetResults,
+			emergencyContacts: emergContactResults,
 		});
 	});
