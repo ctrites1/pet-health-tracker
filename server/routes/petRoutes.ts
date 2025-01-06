@@ -106,7 +106,14 @@ export const petsRoute = new Hono()
 	.get("/:id{[0-9]+}/health-records", getUser, async (c) => {
 		const paramId = Number.parseInt(c.req.param("id"));
 
-		const result = await db
+		const nameResult = await db
+			.select({
+				name: petsTable.name,
+			})
+			.from(petsTable)
+			.where(eq(petsTable.id, paramId));
+
+		const recordsResults = await db
 			.select({
 				id: healthRecordsTable.id,
 				visitDate: healthRecordsTable.visitDate,
@@ -128,5 +135,8 @@ export const petsRoute = new Hono()
 				eq(healthRecordsTable.vetId, vetContactsTable.id)
 			);
 
-		return c.json(result);
+		return c.json({
+			name: nameResult[0].name,
+			records: recordsResults,
+		});
 	});
