@@ -1,8 +1,10 @@
 # Petfolio: Pet Health Tracker Web App
 
-### Note:
+### To-Do
 
-There's this error I found that I can't seem to solve. When I login, it can't find the auth credentials, even though
-I can see them in the cookies.
+- Tanstack Router (pre-loading links & stuff)
+- Tanstack Query optimistic updates
 
-If you go to just "/", it shows the page all good, with _user_ logged in. It looks like it's an issue with routing and auth?
+### Bugs/Fixes
+
+- On Health Records page, make it possible to have multiple accordions open at once
