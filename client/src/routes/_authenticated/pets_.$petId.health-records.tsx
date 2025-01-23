@@ -136,7 +136,7 @@ function HealthRecords() {
 							</div>
 						</CardHeader>
 						<CardContent>
-							<Accordion type="single" collapsible>
+							<Accordion type="multiple">
 								<AccordionItem value="details">
 									<AccordionTrigger>Visit Details</AccordionTrigger>
 									<AccordionContent>
