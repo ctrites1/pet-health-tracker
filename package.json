@@ -7,10 +7,14 @@
     "dev": "bun --watch server/index.ts"
   },
   "devDependencies": {
+    "@eslint/js": "^9.25.1",
     "@flydotio/dockerfile": "^0.5.9",
     "@types/bun": "latest",
     "@types/pg": "^8.11.10",
-    "drizzle-kit": "^0.29.1"
+    "drizzle-kit": "^0.29.1",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
