@@ -135,7 +135,7 @@ function Index() {
   const speciesInfo = getSpeciesInfo();
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="page-container">
       <main className="flex-1 p-6 md:p-8 space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
