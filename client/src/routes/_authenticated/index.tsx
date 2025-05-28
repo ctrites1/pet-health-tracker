@@ -136,7 +136,7 @@ function Index() {
 
   return (
     <div className="page-container">
-      <main className="flex-1 p-6 md:p-8 space-y-8">
+      <main className="content-wrapper">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -159,7 +159,7 @@ function Index() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-md bg-white/50 dark:bg-gray-800/80 dark:backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Total Pets</CardTitle>
               <Heart className="h-4 w-4 text-red-500" />
@@ -173,7 +173,7 @@ function Index() {
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-md bg-white/50 dark:bg-gray-800/80 dark:backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Pet Types</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-500" />
@@ -196,7 +196,7 @@ function Index() {
             speciesInfo.slice(0, 2).map(species => (
               <Card
                 key={species.species}
-                className="border-0 shadow-lg bg-white/80 backdrop-blur-sm"
+                className="border-0 shadow-md bg-white/50 dark:bg-gray-800/80 dark:backdrop-blur-sm"
               >
                 <CardContent className="pt-6">
                   <div className="text-center">
@@ -250,28 +250,6 @@ function Index() {
             </div>
           )}
         </div>
-
-        {!isLoading && speciesInfo.length > 0 && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Pet Types Overview</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {speciesInfo.map(species => (
-                <Card
-                  key={species.species}
-                  className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-shadow duration-200"
-                >
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-4xl mb-3">{species.emoji}</div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{species.label}</h3>
-                      <p className="text-sm text-gray-600">{species.displayCount}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

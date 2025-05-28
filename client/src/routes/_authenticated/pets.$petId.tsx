@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { Link } from '@tanstack/react-router';
+import { PuffLoader } from 'react-spinners';
 
 export const Route = createFileRoute('/_authenticated/pets/$petId')({
   component: PetPage,
@@ -104,9 +105,51 @@ function PetPage() {
     };
   }, [previewUrl]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading pet profile: {error.message}</div>;
-  if (!pet) return <div>Pet not found</div>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <PuffLoader color="#3B82F6" size={60} />
+          <p className="mt-4 text-gray-600 font-medium justify-center">Loading...</p>
+        </div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Oops! Something went wrong</h2>
+          <p className="text-gray-600 mb-4">Error loading pet profile: {error.message}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+
+  if (!pet)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
+          <div className="text-gray-400 text-6xl mb-4">🐾</div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Pet Not Found</h2>
+          <p className="text-gray-600 mb-4">
+            The pet you're looking for doesn't exist or may have been removed.
+          </p>
+          <Link
+            to="/pets"
+            className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Back to Pets
+          </Link>
+        </div>
+      </div>
+    );
 
   const fields: Array<{
     name: keyof Pet;
@@ -158,8 +201,8 @@ function PetPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <Card>
+    <div className="max-w-4xl mx-auto p-6">
+      <Card className="border-0 shadow-md bg-white/50 dark:bg-gray-800/80 dark:backdrop-blur-sm">
         <CardHeader className="flex flex-row justify-end gap-2 items-center">
           {isEditing ? (
             <>
