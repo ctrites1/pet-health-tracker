@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { Link } from '@tanstack/react-router';
-import { PuffLoader } from 'react-spinners';
+import LoadingPulse from '@/components/LoadingPulse';
 
 export const Route = createFileRoute('/_authenticated/pets/$petId')({
   component: PetPage,
@@ -105,15 +105,7 @@ function PetPage() {
     };
   }, [previewUrl]);
 
-  if (isLoading)
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <PuffLoader color="#3B82F6" size={60} />
-          <p className="mt-4 text-gray-600 font-medium justify-center">Loading...</p>
-        </div>
-      </div>
-    );
+  if (isLoading) return <LoadingPulse />;
 
   if (error)
     return (
