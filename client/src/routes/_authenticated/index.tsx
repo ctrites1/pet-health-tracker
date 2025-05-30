@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Heart, PawPrint, TrendingUp, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_authenticated/')({
   component: Index,
@@ -152,10 +153,12 @@ function Index() {
               Monitor and track your pets' health and wellbeing
             </p>
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Pet
-          </Button>
+          <Link to="/pets/new">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Pet
+            </Button>
+          </Link>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
