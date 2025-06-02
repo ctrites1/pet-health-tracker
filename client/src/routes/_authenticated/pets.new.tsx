@@ -1,6 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
-import { useCallback, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { useCallback, useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -13,8 +14,6 @@ import { Label } from '@/components/ui/label';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { PetSpecies } from '@shared/types/petEnum';
 import { createPetSchema } from '@server/sharedTypes';
-import { useNavigate } from '@tanstack/react-router';
-import { useMutation } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/_authenticated/pets/new')({
   component: NewPet,
@@ -23,6 +22,11 @@ export const Route = createFileRoute('/_authenticated/pets/new')({
 function NewPet() {
   const [preview] = useState<string | null>(null);
   const navigate = useNavigate();
+  const router = useRouter();
+
+  const handleGoBack = () => {
+    router.history.back();
+  };
 
   const addPetMutation = useMutation({
     mutationFn: async (petData: typeof createPetSchema._type) => {
@@ -72,6 +76,19 @@ function NewPet() {
     },
   });
 
+  useEffect(() => {
+    form.validate('change');
+  }, []);
+
+  const isFormValid = () => {
+    const values = form.state.values;
+    const hasRequiredFields = values.name.trim() !== '' && values.species !== '';
+    const hasNoErrors = form.state.errors.length === 0;
+    return hasRequiredFields && hasNoErrors;
+  };
+
+  const canSubmit = isFormValid() && !addPetMutation.isPending;
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -117,7 +134,10 @@ function NewPet() {
                       name={field.name}
                       value={String(field.state.value)}
                       onBlur={field.handleBlur}
-                      onChange={e => field.handleChange(e.target.value)}
+                      onChange={e => {
+                        field.handleChange(e.target.value);
+                        setTimeout(() => form.validate('change'), 0);
+                      }}
                       className="bg-white/50 dark:bg-gray-800/80"
                     />
                     {field.state.meta.isTouched && field.state.meta.errors.length ? (
@@ -141,7 +161,10 @@ function NewPet() {
                     </Label>
                     <Select
                       value={String(field.state.value)}
-                      onValueChange={value => field.handleChange(value)}
+                      onValueChange={value => {
+                        field.handleChange(value);
+                        setTimeout(() => form.validate('change'), 0);
+                      }}
                     >
                       <SelectTrigger className="bg-white/50 dark:bg-gray-800/80">
                         <SelectValue placeholder="Select species" />
@@ -241,9 +264,8 @@ function NewPet() {
         <div className="flex justify-end gap-4">
           <button
             type="button"
-            onClick={() => form.reset()}
+            onClick={handleGoBack}
             className="px-6 py-2 rounded-lg border border-gray-200 bg-gray-50 text-black text-base hover:-translate-y-1 transform transition duration-200 hover:shadow-md"
-            disabled={addPetMutation.isPending || !form.state.canSubmit}
           >
             Cancel
           </button>
@@ -251,22 +273,16 @@ function NewPet() {
             type="submit"
             onClick={() => form.handleSubmit()}
             className={`
-							px-6 py-2 rounded-lg border
-							${
-                addPetMutation.isPending
-                  ? 'border-gray-300 bg-gray-100 text-gray-500'
-                  : !form.state.canSubmit
-                    ? 'border-gray-300 bg-gray-200 text-gray-400'
-                    : 'border-logo-green bg-logo-green text-white'
-              }
-							text-base 
-							hover:not:disabled:-translate-y-1 
-							transform transition duration-200 
-							hover:not:disabled:shadow-md 
-							disabled:opacity-20 
-							disabled:cursor-not-allowed
-							disabled:hover:transform-none
-						  `}
+							px-6 py-2 rounded-lg border text-base transform transition duration-200
+                ${
+                  !canSubmit
+                    ? 'border-gray-300 bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : addPetMutation.isPending
+                      ? 'border-gray-300 bg-gray-100 text-gray-500 cursor-wait'
+                      : 'border-logo-green bg-logo-green text-white hover:-translate-y-1 hover:shadow-md'
+                }
+              ${!canSubmit ? 'opacity-50' : ''}
+            `}
             disabled={addPetMutation.isPending || !form.state.canSubmit}
           >
             {addPetMutation.isPending ? 'Adding Pet...' : 'Add Pet'}
