@@ -22,12 +22,6 @@ function NavBar() {
                 Petfolio
               </Link>
             </h2>
-
-            <h2 className="text-xl font-normal">
-              <Link to="/pets/new" className="text-white hover:text-logo-green">
-                +Pet
-              </Link>
-            </h2>
             <h2 className="text-xl font-normal">
               <Link to="/profile" className="text-white hover:text-logo-green">
                 Profile

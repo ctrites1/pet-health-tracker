@@ -19,10 +19,11 @@ import { useMutation } from '@tanstack/react-query';
 export const Route = createFileRoute('/_authenticated/pets/new')({
   component: NewPet,
 });
-
+// Figure out how to get form validation when required onBlur of both required fields
 function NewPet() {
   const [preview] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [canAddPet, setCanAddPet] = useState(false);
 
   const addPetMutation = useMutation({
     mutationFn: async (petData: typeof createPetSchema._type) => {
@@ -267,7 +268,7 @@ function NewPet() {
 							disabled:cursor-not-allowed
 							disabled:hover:transform-none
 						  `}
-            disabled={addPetMutation.isPending || !form.state.canSubmit}
+            disabled={addPetMutation.isPending || !form.state.canSubmit || !canAddPet}
           >
             {addPetMutation.isPending ? 'Adding Pet...' : 'Add Pet'}
           </button>
