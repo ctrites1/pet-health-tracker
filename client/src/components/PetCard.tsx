@@ -20,13 +20,13 @@ export default function PetCard({ pet }: { pet: Pet }) {
 
   return (
     <div className="max-w-xs w-full group/card m-2">
-      <div className="relative overflow-hidden bg-white/80 rounded-lg shadow-md h-full transition-transform duration-300 group-hover/card:scale-[1.02]">
+      <div className="relative overflow-hidden bg-white/60 rounded-lg shadow-md h-full transition-transform duration-300 group-hover/card:scale-[1.02]">
         <Link
           to="/pets/$petId"
           params={{ petId: pet.id.toString() }}
           className="block cursor-pointer"
         >
-          <div className="absolute w-full h-full top-0 left-0 transition duration-300 group-hover/card:bg-slate-800 opacity-0 group-hover/card:opacity-70 z-5"></div>
+          <div className="absolute w-full h-full top-0 left-0 transition duration-300 group-hover/card:bg-slate-800/80 opacity-0 group-hover/card:opacity-70 z-5"></div>
 
           <CardContent className="pt-4 relative">
             <div className="flex flex-col items-center">
